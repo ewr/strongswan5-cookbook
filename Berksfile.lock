@@ -1,6 +1,6 @@
 {
   "sources": {
-    "strongswan": {
+    "strongswan5": {
       "path": "."
     },
     "apt": {

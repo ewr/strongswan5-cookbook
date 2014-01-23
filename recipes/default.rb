@@ -53,4 +53,41 @@ end
 
 # -- Host Networking -- #
 
+service "procps" do
+  action :nothing
+  provider Chef::Provider::Service::Upstart
+  supports [:start]
+end
+
+# allow forwarding
+file "/etc/sysctl.d/40-net.ipv4.ip_forward.conf" do
+  content "net.ipv4.ip_forward = 1\n"
+  mode 0644
+  notifies :start, "service[procps]"
+end
+
+# disallow icmp redirects
+file "/etc/sysctl.d/40-disallow_icmp_redirects.conf" do
+  content "net.ipv4.conf.all.accept_redirects = 0\nnet.ipv4.conf.all.send_redirects = 0\n"
+  mode 0644
+  notifies :start, "service[procps]"
+end
+
+# -- IP Tables -- #
+
+cookbook_file "/etc/init/iptables.conf" do
+  action :create
+  source "iptables.upstart.conf"
+end
+
+service "iptables" do
+  provider Chef::Provider::Service::Upstart
+  action :nothing
+end
+
+template "/etc/iptables.rules" do
+  action :create
+  source "iptables.rules.erb"
+  notifies :start, "service[iptables]"
+end
 

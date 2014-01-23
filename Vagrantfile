@@ -27,8 +27,8 @@ Vagrant.configure("2") do |config|
     }
 
     chef.run_list = [
-      "recipe[strongswan]",
-      "recipe[strongswan::test_user]"
+      "recipe[strongswan5]",
+      "recipe[strongswan5::test_user]"
     ]
   end
 end
