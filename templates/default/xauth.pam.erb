@@ -1,0 +1,11 @@
+#%PAM-1.0
+auth        required      pam_env.so
+
+# authenticate via the local system
+session [success=ok ignore=ignore module_unknown=ignore default=bad] pam_selinux.so close
+
+@include common-auth
+
+@include common-account
+@include common-session
+@include common-password

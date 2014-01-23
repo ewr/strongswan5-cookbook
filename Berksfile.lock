@@ -1,0 +1,10 @@
+{
+  "sources": {
+    "strongswan": {
+      "path": "."
+    },
+    "apt": {
+      "locked_version": "2.1.0"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+# ipsec.conf - strongSwan IPsec configuration file
+
+# basic configuration
+
+config setup
+
+conn %default
+	ikelifetime=60m
+	keylife=20m
+	rekeymargin=3m
+	keyingtries=1
+	keyexchange=ikev1
+
+conn vpn
+    left=<%= node.strongswan.left %>
+    leftid=@<%= node.strongswan.vpn_id %>
+    leftsubnet=<%= node.strongswan.subnets %>
+    right=%any
+    leftauth=psk
+    rightauth=psk
+    rightauth2=xauth-pam
+    rightsourceip=<%= node.strongswan.ip_range %>
+    rightdns=<%= node.strongswan.rightdns %>
+    auto=add
+    dpdaction=clear
