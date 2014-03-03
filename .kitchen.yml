@@ -1,0 +1,15 @@
+---
+driver_plugin: vagrant
+driver_config:
+  require_chef_omnibus: true
+  
+provisioner: chef_zero
+
+platforms:
+  - name: ubuntu-12.04
+  
+suites:
+  - name: default
+    run_list: 
+      - "recipe[strongswan5-test::test_user]"
+      - "recipe[strongswan5]"

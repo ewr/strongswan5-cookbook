@@ -23,7 +23,7 @@ COMMIT
 :PREROUTING ACCEPT [0:0]
 :POSTROUTING ACCEPT [0:0]
 :OUTPUT ACCEPT [0:0]
--A POSTROUTING -s <%= node.strongswan5.ip_range %> -o eth0 -m policy --dir out --pol ipsec -j ACCEPT
--A POSTROUTING -s <%= node.strongswan5.ip_range %> -o eth0 -j MASQUERADE
+-A POSTROUTING -s <%= node.strongswan5.ip_range %> -m policy --dir out --pol ipsec -j ACCEPT
+-A POSTROUTING -s <%= node.strongswan5.ip_range %> -j MASQUERADE
 COMMIT
 ### end nat
