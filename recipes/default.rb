@@ -42,6 +42,15 @@ template "/etc/ipsec.conf" do
   notifies :restart, "service[strongswan]"
 end
 
+# -- write subnet-attrs.conf -- #
+
+template "/etc/strongswan.d/subnet-attrs.conf" do
+  source  "subnet-attrs.conf.erb"
+  user    "root"
+  mode    0644
+  notifies :restart, "service[strongswan]"
+end
+
 # -- write ipsec.secrets -- #
 
 template "/etc/ipsec.secrets" do

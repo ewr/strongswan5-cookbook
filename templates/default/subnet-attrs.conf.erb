@@ -1,0 +1,9 @@
+charon {
+  plugins {
+    attr {
+      <% if node.strongswan5.subnets != "0.0.0.0/0" %>
+      split-include = <%= node.strongswan5.subnets %>
+      <% end %>
+    }
+  }
+}
