@@ -10,6 +10,8 @@ default.strongswan5.rightdns       = "8.8.8.8,8.8.4.4"
 default.strongswan5.xauth_pam_template          = "xauth.pam.erb"
 default.strongswan5.xauth_pam_template_cookbook = "strongswan5"
 
+default.strongswan5.enable_firewall = true
+
 default.strongswan5.accept_interfaces = ["lo","eth1"]
 default.strongswan5.icmp_allowed      = true
 default.strongswan5.tcp_ports_allowed = [22,500,4500]
