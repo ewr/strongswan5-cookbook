@@ -28,9 +28,11 @@ end
 # -- write pam.d/xauth -- #
 
 template "/etc/pam.d/xauth" do
-  source  "xauth.pam.erb"
-  user    "root"
-  mode    644
+  source    "xauth.pam.erb"
+  source    node.strongswan5.xauth_pam_template
+  cookbook  node.strongswan5.xauth_pam_template_cookbook
+  user      "root"
+  mode      644
 end
 
 # -- write ipsec.conf -- #
