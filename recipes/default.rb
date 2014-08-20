@@ -28,9 +28,11 @@ end
 # -- write pam.d/xauth -- #
 
 template "/etc/pam.d/xauth" do
-  source  "xauth.pam.erb"
-  user    "root"
-  mode    644
+  source    "xauth.pam.erb"
+  source    node.strongswan5.xauth_pam_template
+  cookbook  node.strongswan5.xauth_pam_template_cookbook
+  user      "root"
+  mode      644
 end
 
 # -- write ipsec.conf -- #
@@ -86,58 +88,62 @@ end
 
 include_recipe "iptables-ng::install"
 
-iptables_ng_chain "FIREWALL" do
-  policy "- [0:0]"
-end
+if node.strongswan5.enable_firewall
 
-# send traffic to the firewall
-iptables_ng_rule "75-strongswan5-firewall-input" do
-  chain "INPUT"
-  table "filter"
-  rule  "-j FIREWALL"
-end
+  iptables_ng_chain "FIREWALL" do
+    policy "- [0:0]"
+  end
 
-# allow all traffic from these interfaces
+  # send traffic to the firewall
+  iptables_ng_rule "75-strongswan5-firewall-input" do
+    chain "INPUT"
+    table "filter"
+    rule  "-j FIREWALL"
+  end
 
-iptables_ng_rule "80-strongswan5-allow-interfaces" do
-  chain "FIREWALL"
-  table "filter"
-  rule  (node.strongswan5.accept_interfaces||[]).collect {|iface| "-i #{iface} -j ACCEPT" }
-end
+  # allow all traffic from these interfaces
 
-# allow ICMP traffic?
-iptables_ng_rule "81-strongswan5-icmp" do
-  action  node.strongswan5.icmp_allowed ? :create : :delete
-  chain   "FIREWALL"
-  table   "filter"
-  rule    "-p icmp -j ACCEPT"
-end
+  iptables_ng_rule "80-strongswan5-allow-interfaces" do
+    chain "FIREWALL"
+    table "filter"
+    rule  (node.strongswan5.accept_interfaces||[]).collect {|iface| "-i #{iface} -j ACCEPT" }
+  end
 
-iptables_ng_rule "82-strongswan5-established" do
-  chain "FIREWALL"
-  table "filter"
-  rule  "-m state --state ESTABLISHED,RELATED -j ACCEPT"
-end
+  # allow ICMP traffic?
+  iptables_ng_rule "81-strongswan5-icmp" do
+    action  node.strongswan5.icmp_allowed ? :create : :delete
+    chain   "FIREWALL"
+    table   "filter"
+    rule    "-p icmp -j ACCEPT"
+  end
 
-# set up TCP port allows
-iptables_ng_rule "83-strongswan5-tcpports" do
-  chain   "FIREWALL"
-  table   "filter"
-  rule    (node.strongswan5.tcp_ports_allowed||[]).collect {|p| "-m state --state NEW -m tcp -p tcp --dport #{p} -j ACCEPT" }
-end
+  iptables_ng_rule "82-strongswan5-established" do
+    chain "FIREWALL"
+    table "filter"
+    rule  "-m state --state ESTABLISHED,RELATED -j ACCEPT"
+  end
 
-# set up UDP port allows
-iptables_ng_rule "83-strongswan5-udpports" do
-  chain   "FIREWALL"
-  table   "filter"
-  rule    (node.strongswan5.udp_ports_allowed||[]).collect {|p| "-m state --state NEW -m udp -p udp --dport #{p} -j ACCEPT" }
-end
+  # set up TCP port allows
+  iptables_ng_rule "83-strongswan5-tcpports" do
+    chain   "FIREWALL"
+    table   "filter"
+    rule    (node.strongswan5.tcp_ports_allowed||[]).collect {|p| "-m state --state NEW -m tcp -p tcp --dport #{p} -j ACCEPT" }
+  end
 
-# reject everything else
-iptables_ng_rule "84-strongswan5-reject" do
-  chain "FIREWALL"
-  table "filter"
-  rule  "-j REJECT"
+  # set up UDP port allows
+  iptables_ng_rule "83-strongswan5-udpports" do
+    chain   "FIREWALL"
+    table   "filter"
+    rule    (node.strongswan5.udp_ports_allowed||[]).collect {|p| "-m state --state NEW -m udp -p udp --dport #{p} -j ACCEPT" }
+  end
+
+  # reject everything else
+  iptables_ng_rule "84-strongswan5-reject" do
+    chain "FIREWALL"
+    table "filter"
+    rule  "-j REJECT"
+  end
+
 end
 
 iptables_ng_rule "98-strongswan5-accept" do
